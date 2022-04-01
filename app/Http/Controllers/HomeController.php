@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+session_start();
+
 use Illuminate\Http\Request;
 
 use App\Helpers\Mysql;
@@ -18,33 +20,40 @@ class HomeController extends Controller
 
   public function article(Request $request, $article)
   {
+    $token = md5(uniqid());
+    $_SESSION['token'] = $token;
+
     $article = \App\Models\Article::find($article);
-    return view('article', ['article' => $article]);
+    return view('article', ['article' => $article, 'token' => $token]);
   }
 
   public function search(Request $request)
   {
-    $mysql = new Mysql;
+      if ($request->token == $_SESSION['token']) {
+          $mysql = new Mysql;
 
-    $articles = $mysql->like('articles', '*', ['title' => $request->search]);
+          $articles = $mysql->like('articles', '*', ['title' => $request->search]);
 
-    if(!$articles) $articles = [];
+          if(!$articles) $articles = [];
+      }
 
     return view('search', [
       'articles' => $articles,
-      'search' => $request->search
+      'search' => htmlspecialchars($request->search)
     ]);
   }
 
   public function addComment(Request $request)
   {
-    $mysql = new Mysql;
+    if ($request->token == $_SESSION['token']) {
+        $mysql = new Mysql;
 
-    $mysql->insert('comments', [
-      'author' => $request->author,
-      'message' => $request->message,
-      'article_id' => $request->article_id,
-    ]);
+        $mysql->insert('comments', [
+            'author' => htmlspecialchars($request->author),
+            'message' => htmlspecialchars($request->message),
+            'article_id' => htmlspecialchars($request->article_id),
+        ]);
+    }
 
     return redirect()->route('home.article', $request->article_id);
   }

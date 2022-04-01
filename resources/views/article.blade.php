@@ -21,6 +21,7 @@
     <p>Author name : </p><input type="text" name="author" />
     <p>Message : </p><textarea name="message"></textarea>
     <input type="hidden" name="article_id" value="{{ $article->id }}">
+    <input type="hidden" name="token" value="{{ $token }}">
     <br>
     <button type="submit">Send my comment !</button>
   </form>

@@ -10,6 +10,7 @@
     <input type="text" name="title" />
     <label>Content :</label>
     <textarea name="content"></textarea>
+      <input type="hidden" name="token" value="{{ $token }}">
     <button type="submit">Save my new article</button>
   </form>
 @endsection
